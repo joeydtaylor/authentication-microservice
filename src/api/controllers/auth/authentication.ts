@@ -1,4 +1,3 @@
-import jwt_decode from "jwt-decode";
 import { Request, Response } from "express";
 import { Sealed, ApplyConfiguration } from "../../../helpers/configuration";
 import passport from "passport";
@@ -99,8 +98,7 @@ export class Authentication implements Authorization.IAuthenticate {
           break;
         case "oidc":
           req.user.username = req.user.userinfo.preferred_username;
-          let decoded: any = jwt_decode(req.user.tokens.access_token);
-          currentGroups = decoded ? decoded.Groups : undefined;
+          currentGroups = req.user.userinfo.groups;
           break;
         default:
           req.user.username = undefined;

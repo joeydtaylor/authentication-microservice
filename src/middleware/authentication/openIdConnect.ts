@@ -9,7 +9,7 @@ module.exports = (app: express.Application, config: Configuration.ISchema) => {
       config.security.authentication.oidcConfiguration.client_secret,
     appBaseUrl: `${config.app.baseUrl}`,
     response_type: "access_token",
-    scope: "openid profile",
+    scope: "openid profile groups",
     routes: {
       login: {
         path: "/api/auth/oidc/login",
