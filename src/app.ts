@@ -62,7 +62,7 @@ const main = async () => {
   // Create RedisStore
   const redisStore = new RedisStore({
     client: redisClient,
-    prefix: "myapp:",
+    prefix: globalConfiguration.app.name,
   });
 
   app.use(
