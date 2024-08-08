@@ -46,8 +46,4 @@ class GlobalConfiguration implements Configuration.ISchema {
 
 export const globalConfiguration = new GlobalConfiguration();
 
-module.exports = {
-  Sealed,
-  ApplyConfiguration,
-  globalConfiguration,
-};
+export { config, GlobalConfiguration };
