@@ -7,8 +7,8 @@ import helmet from "helmet";
 import https from "https";
 import fs from "fs";
 import path from "path";
-import Redis from "ioredis";
-import connectRedis from "connect-redis";
+import Redis from 'ioredis';
+import RedisStore from "connect-redis"
 import { ApolloServer } from "apollo-server-express";
 import compression from "compression";
 import "reflect-metadata";
@@ -57,49 +57,27 @@ const main = async () => {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
-  let redisClient;
-  let RedisStore;
+  const redisClient = new Redis(globalConfiguration.security.authentication.sessionStoreConfiguration.redisConnectionString);
 
-  globalConfiguration.security.authentication.sessionStoreConfiguration
-    .redisConnectionString &&
-    (redisClient = new Redis(
-      globalConfiguration.security.authentication.sessionStoreConfiguration.redisConnectionString
-    )) &&
-    (RedisStore = connectRedis(session));
+  // Create RedisStore
+  const redisStore = new RedisStore({
+    client: redisClient,
+    prefix: "myapp:",
+  });
 
   app.use(
     session({
-      store: RedisStore && new RedisStore({ client: redisClient }),
-      name: globalConfiguration.security.authentication
-        .sessionStoreConfiguration.cookie.name,
-      resave:
-        globalConfiguration.security.authentication.sessionStoreConfiguration
-          .resave,
-      saveUninitialized:
-        globalConfiguration.security.authentication.sessionStoreConfiguration
-          .saveUninitialized,
-      secret:
-        globalConfiguration.security.authentication.sessionStoreConfiguration
-          .cookie.secret,
+      store: redisStore,
+      name: globalConfiguration.security.authentication.sessionStoreConfiguration.cookie.name,
+      resave: globalConfiguration.security.authentication.sessionStoreConfiguration.resave,
+      saveUninitialized: globalConfiguration.security.authentication.sessionStoreConfiguration.saveUninitialized,
+      secret: globalConfiguration.security.authentication.sessionStoreConfiguration.cookie.secret,
       cookie: {
-        signed:
-          globalConfiguration.security.authentication.sessionStoreConfiguration
-            .cookie.signed,
-        secure:
-          globalConfiguration.security.authentication.sessionStoreConfiguration
-            .cookie.secure,
-        httpOnly:
-          globalConfiguration.security.authentication.sessionStoreConfiguration
-            .cookie.httpOnly,
-        sameSite:
-          globalConfiguration.security.authentication.sessionStoreConfiguration
-            .cookie.sameSite,
-        maxAge:
-          globalConfiguration.security.authentication.sessionStoreConfiguration
-            .cookie.maxAgeInHours *
-          60 *
-          60 *
-          1000,
+        signed: globalConfiguration.security.authentication.sessionStoreConfiguration.cookie.signed,
+        secure: globalConfiguration.security.authentication.sessionStoreConfiguration.cookie.secure,
+        httpOnly: globalConfiguration.security.authentication.sessionStoreConfiguration.cookie.httpOnly,
+        sameSite: globalConfiguration.security.authentication.sessionStoreConfiguration.cookie.sameSite,
+        maxAge: globalConfiguration.security.authentication.sessionStoreConfiguration.cookie.maxAgeInHours * 60 * 60 * 1000,
       },
     })
   );
@@ -227,7 +205,7 @@ const main = async () => {
   } else {
     console.error({
       message:
-        "Startup failed because there is not atleast one authentication method enabled",
+        "Startup failed because there is not at least one authentication method enabled",
       type: "error",
     });
   }
