@@ -39,8 +39,8 @@ const main = async () => {
   app.use(passport.initialize());
 
   // Logging and Monitoring Middleware
-  require("./middleware/logging/logger")(app, globalConfiguration);
-  require("./middleware/logging/prometheus")(app);
+  await require("./middleware/logging/logger")(app, globalConfiguration);
+  await require("./middleware/logging/prometheus")(app);
 
   // Compression and Security Middleware (Only in Production)
   conditionalUse(compression(), app, process.env.NODE_ENV === "production");
@@ -84,20 +84,20 @@ const main = async () => {
 
   // Conditionally Load Routes Based on Enabled Authentication
   if (globalConfiguration.security.authentication.oidcConfiguration.enabled) {
-    require("./middleware/authentication/openIdConnect")(app, globalConfiguration);
-    require("./api/routes/auth/oidc")(app);
+    await require("./middleware/authentication/openIdConnect")(app, globalConfiguration);
+    await require("./api/routes/auth/oidc")(app);
   }
 
   if (globalConfiguration.security.authentication.samlConfiguration.enabled) {
-    require("./api/routes/auth/saml")(app, globalConfiguration, passport);
+    await require("./api/routes/auth/saml")(app, globalConfiguration, passport);
   }
 
   if (globalConfiguration.security.authentication.localConfiguration.enabled) {
-    require("./api/routes/auth/local")(app, passport);
+    await require("./api/routes/auth/local")(app, passport);
   }
-  require("./api/routes/auth/logout")(app, globalConfiguration);
-  require("./api/routes/auth/session")(app);
-  require("./api/routes/index")(app);
+  await require("./api/routes/auth/logout")(app, globalConfiguration);
+  await require("./api/routes/auth/session")(app);
+  await require("./api/routes/index")(app);
 
   // GraphQL Schema and Server
   const schema = await buildSchema({
