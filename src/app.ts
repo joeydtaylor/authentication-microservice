@@ -8,14 +8,16 @@ import https from "https";
 import fs from "fs";
 import path from "path";
 import Redis from 'ioredis';
-import RedisStore from "connect-redis"
+import RedisStore from "connect-redis";
 import { ApolloServer } from "apollo-server-express";
+import { ApolloServerPluginLandingPageDisabled } from "apollo-server-core";
 import compression from "compression";
 import "reflect-metadata";
 import depthLimit from "graphql-depth-limit";
 import { buildSchema } from "type-graphql";
 import userContextResolver from "./api/graphql/userContext/userContext.resolver";
 import configurationResolver from "./api/graphql/configuration/configuration.resolver";
+import { InMemoryLRUCache } from '@apollo/utils.keyvaluecache';
 import { globalConfiguration } from "./helpers/configuration";
 
 const main = async () => {
@@ -147,6 +149,9 @@ const main = async () => {
     validationRules: [depthLimit(7)],
     debug: process.env.NODE_ENV === "production" ? false : true,
     introspection: process.env.NODE_ENV === "production" ? false : true,
+    persistedQueries: {
+      cache: new InMemoryLRUCache({ maxSize: 1000 }),
+    },
     context: async ({ req }: Req) => {
       let authenticationContext:
         | Authorization.IAuthenticationContext
@@ -170,6 +175,9 @@ const main = async () => {
         ...globalContext,
       };
     },
+    plugins: [
+      ...(process.env.NODE_ENV === "production" ? [ApolloServerPluginLandingPageDisabled()] : [])
+    ],
   });
 
   await graphQlServer.start();
