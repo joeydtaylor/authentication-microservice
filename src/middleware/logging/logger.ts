@@ -7,7 +7,7 @@ import { globalConfiguration } from "../../helpers/configuration";
 
 const logDir = path.join(
   __dirname,
-  "/../../../" + globalConfiguration.app.logging.logDir
+  "../../../" + globalConfiguration.app.logging.logDir
 );
 const httpLogFileName = "http-access.log";
 const rfs = require("rotating-file-stream");
@@ -45,13 +45,13 @@ module.exports = (app: express.Application, config: Configuration.ISchema) => {
   const fileStream = (filePath: string) => {
     return rfs.createStream(filePath, {
       path: path.join(logDir),
-      maxSize: config.app.logging.logMaxSizeInNumberMB,
+      maxSize: `${config.app.logging.logMaxSizeInNumberMB}M`, // Converted to string with 'M' suffix for megabytes
       rotate: config.app.logging.logMaxFilecount,
       interval: "1h",
       intervalBoundary: true,
       teeToStdout: true,
     });
-  };
+};
 
   app.use(
     morgan(
