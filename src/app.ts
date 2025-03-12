@@ -49,7 +49,7 @@ const main = async () => {
   // CORS and Cookie Parser Middleware
   app.use(cors({
     origin: globalConfiguration.security.corsOrigin,
-    allowedHeaders: ["Content-Type", "Authorization", "Access-Control-Allow-Headers"],
+    allowedHeaders: ["Content-Type", "Authorization", "Access-Control-Allow-Headers", "Access-Control-Allow-Credentials"],
     methods: ["GET", "PUT", "POST", "PATCH", "DELETE", "OPTIONS"],
     credentials: true,
   }));
@@ -102,9 +102,19 @@ const main = async () => {
   // GraphQL Schema and Server
   const schema = await buildSchema({
     resolvers: [userContextResolver, configurationResolver],
-    authChecker: async ({ context }, props) => {
-      const allowList = props.find(acl => acl.allow === "allAuthenticated" || acl.allow.includes(context.currentRole.name || context.user.username)) || [];
-      return (context.user && (allowList === "allAuthenticated" || allowList.includes(context.currentRole.name))) || context.currentRole.name === globalConfiguration.security.authorization.roles.admin.name;
+    authChecker: async ({ context }, roles) => {
+      const currentRoleName = context.currentRole?.name;
+      const userName = context.user?.username;
+      if (roles.length === 0) return true;
+      if (roles.includes("allAuthenticated") && context.user) return true;
+      if (context.user && (roles.includes(currentRoleName) || roles.includes(userName))) {
+        return true;
+      }
+      if (currentRoleName === globalConfiguration.security.authorization.roles.admin?.name) {
+        return true;
+      }
+
+      return false;
     },
   });
 

@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
-import { Sealed, ApplyConfiguration } from "../../../helpers/configuration";
+import { Frozen, ApplyConfiguration } from "../../../helpers/configuration";
 import Authentication from "./authentication";
 
-@Sealed
+@Frozen
 @ApplyConfiguration()
 export class Authorization implements Authorization.IAuthorize {
   public app!: Configuration.IApplicationConfiguration;

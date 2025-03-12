@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import { Sealed, ApplyConfiguration } from "../../../helpers/configuration";
+import { Frozen, ApplyConfiguration } from "../../../helpers/configuration";
 import passport from "passport";
 
-@Sealed
+@Frozen
 @ApplyConfiguration()
 export class Authentication implements Authorization.IAuthenticate {
   public app!: Configuration.IApplicationConfiguration;

@@ -10,7 +10,7 @@ module.exports = (app: express.Application, config: Configuration.ISchema) => {
     client_id,
     client_secret,
     appBaseUrl: baseUrl,
-    response_type: "access_token",
+    response_type: "code",
     scope: "openid profile groups",
     routes: {
       login: {

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "node": "18.15.0"
+    "node": "23.9.0"
   },
   "scripts": {
     "dev": "cross-env NODE_ENV=development nodemon ./src/app.ts --ignore '*.json'",

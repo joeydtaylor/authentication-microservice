@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
-import { ApplyConfiguration, Sealed } from "../../helpers/configuration";
+import { ApplyConfiguration, Frozen } from "../../helpers/configuration";
 import Authorization from "./auth/authorization";
 
-@Sealed
+@Frozen
 @ApplyConfiguration()
 export class Core {
   public app!: Configuration.IApplicationConfiguration;
